@@ -245,7 +245,7 @@
   .modal-btn.save { background: var(--pink-main); color: white; }
   .modal-btn.ok { background: var(--pink-main); color: white; padding: 12px 30px; font-size: 16px; }
 
-  /* --- АДАПТАЦИЯ ПОД ТЕЛЕФОН (УВЕЛИЧЕННЫЕ ЭЛЕМЕНТЫ) --- */
+  /* --- АДАПТАЦИЯ ПОД ТЕЛЕФОН --- */
   @media (max-width: 600px) {
     body {
       padding: 16px 12px 40px;
@@ -282,50 +282,47 @@
       min-width: 120px;
     }
 
-    /* Одна колонка на телефоне */
     .days-grid {
       grid-template-columns: 1fr;
       gap: 10px;
     }
 
     .day-card {
-      padding: 16px 12px;
-      gap: 16px;
+      padding: 12px;
+      gap: 12px;
       border-radius: 16px;
     }
 
     .day-num {
-      font-size: 18px;
-      min-width: 24px;
+      font-size: 16px;
+      min-width: 20px;
     }
 
-    /* УВЕЛИЧЕННЫЕ КАПЛИ ВОДЫ */
     .drops-grid {
-      gap: 8px;
+      gap: 6px;
       flex: 1; 
       justify-content: space-between;
     }
 
     .drop {
-      width: 32px;
-      height: 32px;
-      border-width: 3px;
+      width: 24px;
+      height: 24px;
+      border-width: 2.5px;
     }
     
     .mood-circle {
-      width: 32px;
-      height: 32px;
+      width: 26px;
+      height: 26px;
       flex: 1;
-      max-width: 40px;
+      max-width: 30px;
     }
 
     .note-btn {
-      bottom: 8px;
-      right: 8px;
-      font-size: 16px;
+      bottom: 6px;
+      right: 6px;
+      font-size: 14px;
     }
 
-    /* Таблица спорта */
     .sport-table th, .sport-table td {
       padding: 12px 4px;
       font-size: 13px;
@@ -337,7 +334,6 @@
       font-size: 16px;
     }
 
-    /* Таблица таблеток */
     .pill-table th, .pill-table td {
       padding: 12px 4px;
       font-size: 14px;
@@ -368,7 +364,7 @@
     }
     
     .pill-add-box input, .pill-add-box select, .pill-add-box button {
-      font-size: 16px; /* Предотвращает автозум в Safari */
+      font-size: 16px;
       padding: 14px;
     }
 
@@ -508,6 +504,7 @@
 </div>
 
 <div class="footer">
+  <button class="btn-outline" onclick="unlockAudio()" style="border-color: var(--blue-main); color: var(--blue-dark);">включить звук</button>
   <button class="btn-outline" onclick="exportData()">экспорт</button>
   <button class="btn-outline" onclick="document.getElementById('importFile').click()">импорт</button>
   <input type="file" id="importFile" style="display: none;" accept=".json" onchange="importData(event)">
@@ -552,7 +549,7 @@
 </div>
 
 <script>
-  const STORAGE_KEY = 'soft-tracker-v16';
+  const STORAGE_KEY = 'soft-tracker-v18';
   let state = load();
   let editingNoteDate = null;
   let selectingMoodDate = null;
@@ -580,15 +577,57 @@
   setInterval(updateClock, 1000);
   updateClock();
 
+  // --- ЗВУКИ ---
   let audioCtx = null;
+  let isAudioUnlocked = false;
+
   function initAudio() {
-    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    if (audioCtx.state === 'suspended') audioCtx.resume();
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
   }
+
+  // Принудительная разблокировка звука на iOS
+  function unlockAudio() {
+    initAudio();
+    if (audioCtx) {
+      // Создаем пустой буфер и проигрываем его, чтобы "разбудить" звук
+      const buffer = audioCtx.createBuffer(1, 1, 22050);
+      const source = audioCtx.createBufferSource();
+      source.buffer = buffer;
+      source.connect(audioCtx.destination);
+      source.start(0);
+      isAudioUnlocked = true;
+      playSound('success');
+      alert('звук включен! теперь все кнопки будут звучать.');
+    }
+  }
+
+  // Глобальный перехватчик кликов для разблокировки звука в Safari
+  document.addEventListener('touchstart', function() {
+    if (!isAudioUnlocked) {
+      initAudio();
+      const buffer = audioCtx.createBuffer(1, 1, 22050);
+      const source = audioCtx.createBufferSource();
+      source.buffer = buffer;
+      source.connect(audioCtx.destination);
+      source.start(0);
+      isAudioUnlocked = true;
+    }
+  }, { once: true });
 
   function playSound(type) {
     initAudio();
     if (!audioCtx) return;
+    
+    // Если звук заблокирован, принудительно возобновляем
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
     osc.connect(gain);
