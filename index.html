@@ -244,6 +244,137 @@
   .modal-btn.danger { background: #fca5a5; color: white; }
   .modal-btn.save { background: var(--pink-main); color: white; }
   .modal-btn.ok { background: var(--pink-main); color: white; padding: 12px 30px; font-size: 16px; }
+
+  /* --- АДАПТАЦИЯ ПОД ТЕЛЕФОН (MEDIA QUERIES) --- */
+  @media (max-width: 600px) {
+    body {
+      padding: 16px 8px 40px;
+    }
+    
+    h1 {
+      font-size: 36px;
+      margin-bottom: 16px;
+    }
+
+    .tabs {
+      gap: 4px;
+      margin-bottom: 16px;
+    }
+
+    .tab-btn {
+      font-size: 13px;
+      padding: 8px 12px;
+      flex: 1 1 40%;
+      text-align: center;
+    }
+
+    .card {
+      padding: 16px;
+      border-radius: 20px;
+    }
+
+    .title {
+      font-size: 26px;
+    }
+
+    .month-nav .title {
+      font-size: 26px !important;
+      min-width: 120px;
+    }
+
+    .days-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .day-card {
+      padding: 10px 8px;
+      gap: 6px;
+      border-radius: 12px;
+    }
+
+    .day-num {
+      font-size: 14px;
+      min-width: 18px;
+    }
+
+    .drops-grid {
+      gap: 4px;
+    }
+
+    .drop {
+      width: 18px;
+      height: 18px;
+      border-width: 2px;
+    }
+    
+    .mood-circle {
+      width: 20px;
+      height: 20px;
+    }
+
+    .note-btn {
+      bottom: 4px;
+      right: 4px;
+      font-size: 12px;
+    }
+
+    /* Таблица спорта на телефоне */
+    .sport-table th, .sport-table td {
+      padding: 8px 2px;
+      font-size: 11px;
+    }
+    
+    .sport-check {
+      width: 20px;
+      height: 20px;
+      font-size: 11px;
+    }
+
+    /* Таблица таблеток на телефоне */
+    .pill-table th, .pill-table td {
+      padding: 8px 4px;
+      font-size: 13px;
+    }
+
+    .pill-check {
+      width: 24px;
+      height: 24px;
+      font-size: 12px;
+    }
+
+    .who-badge {
+      font-size: 10px;
+      padding: 2px 6px;
+      margin-left: 4px;
+    }
+
+    .pill-add-box {
+      padding: 12px;
+    }
+
+    .monthly-summary {
+      padding: 16px;
+      margin-top: 16px;
+    }
+
+    .monthly-summary h3 {
+      font-size: 24px;
+    }
+    
+    .monthly-summary p {
+      font-size: 14px;
+    }
+
+    .footer {
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .btn-outline {
+      width: 100%;
+    }
+  }
 </style>
 </head>
 <body>
@@ -330,10 +461,10 @@
         <thead>
           <tr>
             <th>день</th>
-            <th>утренняя йога</th>
-            <th>тренировка</th>
+            <th>утро</th>
+            <th>день</th>
             <th>спина</th>
-            <th>вечерняя йога</th>
+            <th>вечер</th>
           </tr>
         </thead>
         <tbody id="sportTableBody"></tbody>
@@ -400,7 +531,7 @@
 </div>
 
 <script>
-  const STORAGE_KEY = 'soft-tracker-v14';
+  const STORAGE_KEY = 'soft-tracker-v15';
   let state = load();
   let editingNoteDate = null;
   let selectingMoodDate = null;
@@ -781,7 +912,6 @@
   }
   function closeCongrats() { document.getElementById('congratsModal').classList.remove('open'); }
 
-  // --- ЭКСПОРТ / ИМПОРТ ---
   function exportData() {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
     const downloadAnchorNode = document.createElement('a');
