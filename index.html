@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>my soft tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-color: #fcf6f6;
+    --text-main: #6b5757;
+    --text-light: #a38d8d;
+    --card-bg: #ffffff;
+    
+    --pink-light: #fbe4e6;
+    --pink-main: #eba5ad;
+    --pink-dark: #cd8189;
+    
+    --blue-light: #e0f2fe;
+    --blue-main: #7dd3fc;
+    --blue-dark: #38bdf8;
+    
+    --green-light: #ebf1ea;
+    --green-main: #a3c2a1;
+    
+    --border-color: #f2e6e7;
+    --font-hand: 'Caveat', cursive;
+    --font-sans: 'Nunito', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  
+  body {
+    font-family: var(--font-sans);
+    background-color: var(--bg-color);
+    background-image: radial-gradient(var(--border-color) 1px, transparent 1px);
+    background-size: 24px 24px;
+    color: var(--text-main);
+    padding: 24px 16px 60px;
+    max-width: 900px;
+    margin: 0 auto;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .clock-container {
+    text-align: center;
+    margin-bottom: 12px;
+    font-family: var(--font-hand);
+    font-size: 24px;
+    color: var(--text-light);
+  }
+
+  h1 {
+    font-family: var(--font-hand);
+    font-size: 46px;
+    text-align: center;
+    color: var(--text-main);
+    margin-bottom: 24px;
+  }
+
+  .tabs { display: flex; justify-content: center; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+  .tab-btn {
+    font-family: var(--font-sans); font-weight: 600; font-size: 15px;
+    padding: 10px 20px; border: 2px solid transparent; border-radius: 20px;
+    background: transparent; color: var(--text-light); cursor: pointer; transition: all 0.2s;
+  }
+  .tab-btn:hover { color: var(--text-main); }
+  .tab-btn.active {
+    background: var(--card-bg); color: var(--pink-dark);
+    border-color: var(--pink-light); box-shadow: 0 4px 10px rgba(216, 150, 160, 0.1);
+  }
+
+  .screen { display: none; animation: fadeIn 0.3s ease; }
+  .screen.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  .card {
+    background: var(--card-bg); border-radius: 24px; padding: 24px;
+    margin-bottom: 16px; border: 2px solid var(--border-color);
+    box-shadow: 0 6px 16px rgba(92, 74, 74, 0.04);
+  }
+  
+  .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .title { font-family: var(--font-hand); font-size: 32px; }
+  
+  .month-nav { display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 16px; }
+  .month-nav button {
+    background: none; border: none; font-size: 24px; color: var(--text-light); cursor: pointer;
+    transition: color 0.2s; padding: 0 10px;
+  }
+  .month-nav button:hover { color: var(--pink-dark); }
+  .month-nav .title { margin: 0; min-width: 150px; text-align: center; }
+
+  .days-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; }
+  .day-card {
+    border: 2px solid var(--border-color); border-radius: 16px; padding: 12px;
+    position: relative; background: #fffdfd; transition: all 0.2s;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .day-card:active { transform: scale(0.98); }
+  .day-card.today { border-color: var(--pink-main); background: #fffafb; }
+  .day-num { font-family: var(--font-sans); font-weight: 700; font-size: 16px; color: var(--text-main); min-width: 24px; text-align: center; }
+  .day-heart { position: absolute; top: 8px; right: 10px; font-size: 12px; color: var(--border-color); }
+  .day-card.done .day-heart { color: var(--pink-main); }
+
+  .drops-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; justify-items: center; }
+  .drop {
+    width: 22px; height: 22px; border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg); border: 2.5px solid var(--blue-main);
+    cursor: pointer; transition: all 0.15s; background: transparent;
+    position: relative; overflow: hidden;
+  }
+  .drop:hover { background: var(--blue-light); }
+  .drop .water-fill {
+    position: absolute; bottom: 0; left: 0; width: 100%; height: 0%;
+    background: var(--blue-main); transition: height 0.3s ease;
+  }
+  .drop.full .water-fill { height: 100%; }
+  .drop.full { border-color: var(--blue-dark); animation: pop 0.3s ease; }
+  @keyframes pop { 0% { transform: rotate(-45deg) scale(0.8); } 50% { transform: rotate(-45deg) scale(1.15); } 100% { transform: rotate(-45deg) scale(1); } }
+
+  .sport-table { width: 100%; border-collapse: collapse; margin-top: 10px; text-align: center; }
+  .sport-table th { font-family: var(--font-sans); font-weight: 600; font-size: 13px; color: var(--text-light); padding: 12px 6px; border-bottom: 2px solid var(--border-color); }
+  .sport-table th:first-child { text-align: left; padding-left: 10px; }
+  .sport-table td { padding: 10px 6px; border-bottom: 1px dashed var(--border-color); font-size: 15px; font-weight: 600; color: var(--text-main); }
+  .sport-table td:first-child { text-align: left; padding-left: 10px; }
+  
+  .sport-check {
+    width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--green-main);
+    cursor: pointer; transition: all 0.15s; background: transparent;
+    display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; margin: 0 auto;
+  }
+  .sport-check:hover { background: var(--green-light); }
+  .sport-check.full { background: var(--green-main); border-color: #8cb88c; animation: pop 0.3s ease; }
+
+  .pill-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+  .pill-table th { font-family: var(--font-sans); font-weight: 600; font-size: 14px; color: var(--text-light); padding: 10px; text-align: center; border-bottom: 2px solid var(--border-color); }
+  .pill-table th:first-child { text-align: left; }
+  .pill-table td { padding: 12px 10px; border-bottom: 1px dashed var(--border-color); text-align: center; vertical-align: middle; font-size: 15px; }
+  .pill-table td:first-child { text-align: left; font-weight: 600; }
+  
+  .pill-check {
+    width: 28px; height: 28px; border-radius: 8px; border: 2px solid var(--pink-main);
+    background: transparent; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+    color: white; font-size: 14px; transition: all 0.2s; margin: 0 auto;
+  }
+  .pill-check.checked { background: var(--pink-main); animation: pop 0.3s ease; }
+  
+  .pill-del { background: none; border: none; color: var(--text-light); cursor: pointer; font-size: 18px; padding: 4px 8px; transition: color 0.2s; }
+  .pill-del:hover { color: var(--pink-dark); }
+
+  .pill-add-box { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; background: var(--bg-color); padding: 16px; border-radius: 16px; }
+  .pill-add-box input, .pill-add-box select {
+    padding: 12px; border: 2px solid var(--border-color);
+    border-radius: 12px; font-family: var(--font-sans); font-size: 14px; outline: none; background: white;
+  }
+  .pill-add-box input:focus, .pill-add-box select:focus { border-color: var(--pink-main); }
+  .pill-add-box button {
+    padding: 12px; border: none; border-radius: 12px; background: var(--pink-main);
+    color: white; font-family: var(--font-sans); font-weight: 700; font-size: 16px; cursor: pointer; transition: background 0.2s;
+  }
+  .pill-add-box button:hover { background: var(--pink-dark); }
+  
+  .who-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-left: 8px; }
+  .who-me { background: var(--pink-light); color: var(--pink-dark); }
+  .who-kid { background: var(--green-light); color: var(--green-main); }
+
+  .pill-progress-wrap { width: 100%; height: 6px; background: #eee; border-radius: 3px; margin-top: 8px; overflow: hidden; }
+  .pill-progress-bar { height: 100%; background: var(--pink-main); width: 0%; transition: width 0.3s; }
+  .pill-duration-text { font-size: 11px; color: var(--text-light); margin-top: 4px; display: block; font-weight: normal; }
+
+  .mood-circle {
+    width: 24px; height: 24px; border-radius: 50%;
+    border: 2px solid var(--border-color); background: white;
+    display: inline-block; cursor: pointer; transition: all 0.15s;
+    margin: 0 auto;
+  }
+  .mood-circle:hover { border-color: var(--text-light); }
+  .mood-circle.filled { animation: pop 0.3s ease; }
+
+  .note-btn {
+    position: absolute; bottom: 10px; right: 10px; font-size: 14px;
+    color: var(--text-light); cursor: pointer; transition: color 0.2s;
+    background: none; border: none; padding: 4px;
+  }
+  .note-btn:hover { color: var(--pink-dark); }
+  .note-btn.has-note { color: var(--pink-dark); }
+
+  .monthly-summary {
+    margin-top: 24px; padding: 20px; background: var(--bg-color);
+    border-radius: 16px; text-align: center; border: 2px dashed var(--border-color);
+  }
+  .monthly-summary h3 { font-family: var(--font-hand); font-size: 28px; color: var(--pink-dark); margin-bottom: 8px; }
+  .monthly-summary p { font-size: 15px; color: var(--text-main); line-height: 1.5; }
+  .monthly-summary .quote { font-style: italic; color: var(--text-light); margin-top: 12px; font-size: 14px; }
+
+  .footer { margin-top: auto; text-align: center; padding-top: 40px; display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+  .btn-outline {
+    background: transparent; border: 2px dashed var(--border-color); color: var(--text-light);
+    padding: 10px 20px; border-radius: 20px; font-family: var(--font-sans); font-weight: 600; font-size: 13px;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .btn-outline:hover { border-color: var(--pink-main); color: var(--pink-dark); }
+
+  .modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.3); display: none; align-items: center; justify-content: center;
+    z-index: 100; padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: white; border-radius: 20px; padding: 24px; width: 100%; max-width: 400px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 2px solid var(--border-color);
+    text-align: center;
+  }
+  .modal-title { font-family: var(--font-hand); font-size: 32px; margin-bottom: 16px; color: var(--text-main); }
+  
+  .modal-note { text-align: left; }
+  .modal-note textarea {
+    width: 100%; height: 120px; padding: 12px; border: 2px solid var(--border-color);
+    border-radius: 12px; font-family: var(--font-sans); font-size: 14px; outline: none; resize: none;
+    background: var(--bg-color); color: var(--text-main); margin-bottom: 16px;
+  }
+  .modal-note textarea:focus { border-color: var(--pink-main); }
+  
+  .mood-options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+  .mood-opt-btn {
+    padding: 10px; border-radius: 12px; border: none; cursor: pointer;
+    font-family: var(--font-sans); font-weight: 600; color: var(--text-main);
+    transition: transform 0.1s;
+  }
+  .mood-opt-btn:hover { transform: scale(1.02); }
+
+  .modal-actions { display: flex; gap: 10px; justify-content: center; }
+  .modal-btn {
+    padding: 10px 20px; border-radius: 12px; border: none; font-family: var(--font-sans);
+    font-weight: 700; font-size: 14px; cursor: pointer; transition: background 0.2s;
+  }
+  .modal-btn.cancel { background: var(--bg-color); color: var(--text-main); }
+  .modal-btn.danger { background: #fca5a5; color: white; }
+  .modal-btn.save { background: var(--pink-main); color: white; }
+  .modal-btn.ok { background: var(--pink-main); color: white; padding: 12px 30px; font-size: 16px; }
+</style>
+</head>
+<body>
+
+<div class="clock-container" id="liveClock">--:--</div>
+<h1>my soft tracker</h1>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('water')">вода</button>
+  <button class="tab-btn" onclick="switchTab('pills')">таблетки</button>
+  <button class="tab-btn" onclick="switchTab('sport')">спорт</button>
+  <button class="tab-btn" onclick="switchTab('mood')">настроение</button>
+</div>
+
+<div id="screen-water" class="screen active">
+  <div class="card">
+    <div class="month-nav">
+      <button onclick="changeMonth('water', -1)">←</button>
+      <div class="title" id="waterMonthTitle">november</div>
+      <button onclick="changeMonth('water', 1)">→</button>
+    </div>
+    <div class="days-grid" id="waterGrid"></div>
+    <div class="monthly-summary" id="waterSummary"></div>
+  </div>
+</div>
+
+<div id="screen-pills" class="screen">
+  <div class="card">
+    <div class="title" style="margin-bottom: 16px;">таблетки</div>
+    
+    <div class="pill-add-box">
+      <select id="pillPerson">
+        <option value="me">для меня</option>
+        <option value="kid">для Кирочки</option>
+      </select>
+      <input type="text" id="pillInput" placeholder="название лекарства..." />
+      <div style="display: flex; gap: 8px;">
+        <select id="pillFrequency" style="flex: 1;">
+          <option value="1">1 раз в день</option>
+          <option value="2">2 раза в день</option>
+          <option value="3">3 раза в день</option>
+        </select>
+        <select id="pillDuration" style="flex: 1;">
+          <option value="0">бессрочно</option>
+          <option value="3">3 дня</option>
+          <option value="5">5 дней</option>
+          <option value="7">7 дней</option>
+          <option value="10">10 дней</option>
+        </select>
+      </div>
+      <button onclick="addPill()">добавить</button>
+    </div>
+
+    <div class="month-nav">
+      <button onclick="changePillDay(-1)">←</button>
+      <div class="title" id="pillDateDisplay" style="font-size: 24px;">сегодня</div>
+      <button onclick="changePillDay(1)">→</button>
+    </div>
+
+    <table class="pill-table">
+      <thead>
+        <tr>
+          <th>лекарство</th>
+          <th>утро</th>
+          <th>день</th>
+          <th>вечер</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="pillsTableBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<div id="screen-sport" class="screen">
+  <div class="card">
+    <div class="month-nav">
+      <button onclick="changeMonth('sport', -1)">←</button>
+      <div class="title" id="sportMonthTitle">november</div>
+      <button onclick="changeMonth('sport', 1)">→</button>
+    </div>
+    <div style="overflow-x: auto;">
+      <table class="sport-table">
+        <thead>
+          <tr>
+            <th>день</th>
+            <th>утренняя йога</th>
+            <th>тренировка</th>
+            <th>спина</th>
+            <th>вечерняя йога</th>
+          </tr>
+        </thead>
+        <tbody id="sportTableBody"></tbody>
+      </table>
+    </div>
+    <div class="monthly-summary" id="sportSummary"></div>
+  </div>
+</div>
+
+<div id="screen-mood" class="screen">
+  <div class="card">
+    <div class="month-nav">
+      <button onclick="changeMonth('mood', -1)">←</button>
+      <div class="title" id="moodMonthTitle">november</div>
+      <button onclick="changeMonth('mood', 1)">→</button>
+    </div>
+    <div class="days-grid" id="moodGrid"></div>
+    <div class="monthly-summary" id="moodSummary"></div>
+  </div>
+</div>
+
+<div class="footer">
+  <button class="btn-outline" onclick="exportData()">экспорт</button>
+  <button class="btn-outline" onclick="document.getElementById('importFile').click()">импорт</button>
+  <input type="file" id="importFile" style="display: none;" accept=".json" onchange="importData(event)">
+</div>
+
+<div class="modal-overlay" id="noteModal">
+  <div class="modal modal-note">
+    <div class="modal-title" id="modalDateTitle">заметка</div>
+    <textarea id="modalNoteText" placeholder="что-нибудь важное об этом дне..."></textarea>
+    <div class="modal-actions">
+      <button class="modal-btn cancel" onclick="closeNote()">отмена</button>
+      <button class="modal-btn save" onclick="saveNote()">сохранить</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="congratsModal">
+  <div class="modal">
+    <div class="modal-title" id="congratsTitle">ты молодец!</div>
+    <p style="margin-bottom: 24px; font-size: 16px; color: var(--text-light);" id="congratsText">так держать!</p>
+    <button class="modal-btn ok" onclick="closeCongrats()">спасибо</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="moodSelectModal">
+  <div class="modal">
+    <div class="modal-title">как настроение?</div>
+    <div class="mood-options" id="moodOptionsList"></div>
+    <button class="modal-btn cancel" onclick="closeMoodSelect()">отмена</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="confirmDeleteModal">
+  <div class="modal">
+    <div class="modal-title">удалить таблетку?</div>
+    <p style="margin-bottom: 24px; font-size: 15px; color: var(--text-light);">все отметки за прошлые дни тоже сотрутся. ты уверена?</p>
+    <div class="modal-actions">
+      <button class="modal-btn cancel" onclick="closeConfirmDelete()">отмена</button>
+      <button class="modal-btn danger" onclick="confirmDelete()">удалить</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const STORAGE_KEY = 'soft-tracker-v14';
+  let state = load();
+  let editingNoteDate = null;
+  let selectingMoodDate = null;
+  let deletingPillId = null;
+  
+  let viewDate = new Date();
+  let pillDate = new Date();
+
+  const MOODS = [
+    { id: 'energetic', label: 'энергичное', color: '#cdb4f6', adj: 'энергичной', quote: 'энергия - это то, что ты создаешь сама.' },
+    { id: 'happy',     label: 'счастливое', color: '#bde0f5', adj: 'счастливой', quote: 'счастье - это выбор, который ты делаешь каждый день.' },
+    { id: 'calm',      label: 'спокойное',  color: '#c6e6b8', adj: 'спокойной', quote: 'в тишине и спокойствии рождается ясность.' },
+    { id: 'neutral',   label: 'нейтральное',color: '#fdf1b8', adj: 'нейтральной', quote: 'нейтральность - это тоже баланс. и это нормально.' },
+    { id: 'anxious',   label: 'тревожное',  color: '#fce1b6', adj: 'тревожной', quote: 'тревога - это просто твоя забота, которая ищет выход.' },
+    { id: 'sad',       label: 'грустное',   color: '#f6c5c5', adj: 'грустной', quote: 'грусть - это дверь к исцелению. позволь себе чувствовать.' },
+    { id: 'angry',     label: 'злое',       color: '#f5b0b8', adj: 'злой', quote: 'злость - это энергия для перемен. направь ее в нужное русло.' },
+  ];
+
+  const MONTHS_EN = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
+
+  function updateClock() {
+    const now = new Date();
+    document.getElementById('liveClock').textContent = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+  }
+  setInterval(updateClock, 1000);
+  updateClock();
+
+  let audioCtx = null;
+  function initAudio() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  }
+
+  function playSound(type) {
+    initAudio();
+    if (!audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    const now = audioCtx.currentTime;
+
+    if (type === 'click') {
+      osc.type = 'sine'; osc.frequency.setValueAtTime(600, now); osc.frequency.exponentialRampToValueAtTime(400, now + 0.05);
+      gain.gain.setValueAtTime(0.08, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+      osc.start(now); osc.stop(now + 0.05);
+    } else if (type === 'success') {
+      osc.type = 'sine'; osc.frequency.setValueAtTime(440, now); osc.frequency.setValueAtTime(554, now + 0.1); osc.frequency.setValueAtTime(659, now + 0.2);
+      gain.gain.setValueAtTime(0.08, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+      osc.start(now); osc.stop(now + 0.4);
+    }
+  }
+
+  function dateToKey(d) {
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+  function todayKey() { return dateToKey(new Date()); }
+
+  function defaultState() { return { water: {}, pills: [], pillsDone: {}, sport: {}, mood: {}, notes: {} }; }
+
+  function load() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? Object.assign(defaultState(), JSON.parse(raw)) : defaultState();
+    } catch { return defaultState(); }
+  }
+
+  function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+
+  function switchTab(tabName) {
+    playSound('click');
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.screen').forEach(scr => scr.classList.remove('active'));
+    const btns = document.querySelectorAll('.tab-btn');
+    ['water', 'pills', 'sport', 'mood'].forEach((name, i) => {
+      if (name === tabName) btns[i].classList.add('active');
+    });
+    document.getElementById('screen-' + tabName).classList.add('active');
+    
+    if (tabName === 'mood') renderMood();
+    if (tabName === 'sport') renderSport();
+    if (tabName === 'water') renderWater();
+    if (tabName === 'pills') renderPills();
+  }
+
+  function changeMonth(section, direction) {
+    playSound('click');
+    viewDate.setMonth(viewDate.getMonth() + direction);
+    if (section === 'water') renderWater();
+    if (section === 'sport') renderSport();
+    if (section === 'mood') renderMood();
+  }
+
+  function changePillDay(direction) {
+    playSound('click');
+    pillDate.setDate(pillDate.getDate() + direction);
+    renderPills();
+  }
+
+  function renderWater() {
+    const container = document.getElementById('waterGrid');
+    const todayStr = todayKey();
+    const currentMonth = viewDate.getMonth();
+    const currentYear = viewDate.getFullYear();
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    
+    document.getElementById('waterMonthTitle').textContent = MONTHS_EN[currentMonth];
+    let html = '';
+    let daysWithWater = 0;
+    
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      const drops = state.water[dateStr] || [];
+      const count = drops.filter(d => d === 1).length;
+      const isDone = count >= 8;
+      const isToday = dateStr === todayStr;
+      if (isDone) daysWithWater++;
+      
+      html += `<div class="day-card ${isToday ? 'today' : ''} ${isDone ? 'done' : ''}">
+        <span class="day-num">${day}</span>
+        <span class="day-heart">♡</span>
+        <div class="drops-grid">`;
+      for (let i = 0; i < 8; i++) {
+        const isFull = drops[i] === 1;
+        html += `<div class="drop ${isFull ? 'full' : ''}" onclick="toggleDrop('${dateStr}', ${i})"><div class="water-fill"></div></div>`;
+      }
+      html += `</div></div>`;
+    }
+    container.innerHTML = html;
+
+    let summaryText = '';
+    if (daysWithWater === daysInMonth) summaryText = 'в этом месяце ты молодец! каждый день пила столько воды, сколько нужно. это невероятная забота о себе!';
+    else if (daysWithWater > daysInMonth / 2) summaryText = `в этом месяце ты выпила норму воды ${daysWithWater} дней из ${daysInMonth}. отличный результат, продолжай в том же духе!`;
+    else summaryText = `в этом месяце не получилось на 100%, но это нормально. норма воды выполнена ${daysWithWater} дней. не сдавайся!`;
+    document.getElementById('waterSummary').innerHTML = `<h3>итоги месяца</h3><p>${summaryText}</p>`;
+  }
+
+  function toggleDrop(dateStr, index) {
+    initAudio();
+    if (!state.water[dateStr]) state.water[dateStr] = Array(8).fill(0);
+    const currentlyFilled = state.water[dateStr].filter(d => d === 1).length;
+    const wasDone = currentlyFilled >= 8;
+    if (index + 1 > currentlyFilled) {
+      for (let i = 0; i <= index; i++) state.water[dateStr][i] = 1;
+    } else {
+      state.water[dateStr][index] = state.water[dateStr][index] === 1 ? 0 : 1;
+    }
+    playSound('click');
+    save();
+    renderWater();
+    const nowDone = state.water[dateStr].filter(d => d === 1).length >= 8;
+    if (nowDone && !wasDone) setTimeout(() => showCongrats('ты молодец!', 'ты выпила все 8 стаканов воды за сегодня. водичка - это сила!'), 400);
+  }
+
+  const SPORT_KEYS = ['morning', 'workout', 'back', 'evening'];
+  function renderSport() {
+    const tbody = document.getElementById('sportTableBody');
+    const todayStr = todayKey();
+    const currentMonth = viewDate.getMonth();
+    const currentYear = viewDate.getFullYear();
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    document.getElementById('sportMonthTitle').textContent = MONTHS_EN[currentMonth];
+    let html = '';
+    let daysWithAllSport = 0;
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      const sportData = state.sport[dateStr] || {};
+      const isToday = dateStr === todayStr;
+      const doneCount = Object.values(sportData).filter(v => v === 1).length;
+      if (doneCount === 4) daysWithAllSport++;
+      html += `<tr style="${isToday ? 'background-color: var(--green-light);' : ''}"><td>${day}</td>`;
+      SPORT_KEYS.forEach(key => {
+        const isFull = sportData[key] === 1;
+        html += `<td><div class="sport-check ${isFull ? 'full' : ''}" onclick="toggleSport('${dateStr}', '${key}')">${isFull ? '✓' : ''}</div></td>`;
+      });
+      html += `</tr>`;
+    }
+    tbody.innerHTML = html;
+
+    let summaryText = '';
+    if (daysWithAllSport === daysInMonth) summaryText = 'ты выполнила все тренировки в этом месяце! невероятная дисциплина и забота о теле.';
+    else if (daysWithAllSport > daysInMonth / 2) summaryText = `ты отлично потренировалась! полностью выполнено ${daysWithAllSport} дней из ${daysInMonth}. тело скажет спасибо.`;
+    else summaryText = `в этом месяце не получилось на все 100%, но это нормально. полностью выполнено ${daysWithAllSport} дней. главное - продолжать!`;
+    document.getElementById('sportSummary').innerHTML = `<h3>итоги месяца</h3><p>${summaryText}</p>`;
+  }
+
+  function toggleSport(dateStr, key) {
+    initAudio();
+    if (!state.sport[dateStr]) state.sport[dateStr] = {};
+    const wasDone = Object.values(state.sport[dateStr]).filter(v => v === 1).length === 4;
+    state.sport[dateStr][key] = state.sport[dateStr][key] === 1 ? 0 : 1;
+    save();
+    const doneCount = Object.values(state.sport[dateStr]).filter(v => v === 1).length;
+    if (doneCount === 4 && !wasDone) setTimeout(() => showCongrats('ты молодец!', 'все тренировки на сегодня выполнены. тело скажет спасибо!'), 300);
+    else playSound('click');
+    renderSport();
+  }
+
+  function renderPills() {
+    const tbody = document.getElementById('pillsTableBody');
+    const today = todayKey();
+    const pDateStr = dateToKey(pillDate);
+    document.getElementById('pillDateDisplay').textContent = pDateStr === today ? 'сегодня' : pDateStr;
+    if (state.pills.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-light); font-style:italic; padding: 20px;">добавь первую таблетку выше</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = state.pills.map(p => {
+      const dayData = state.pillsDone[pDateStr]?.[p.id] || {};
+      const personLabel = p.person === 'me' ? '<span class="who-badge who-me">я</span>' : '<span class="who-badge who-kid">Кирочка</span>';
+      const showMorning = p.freq >= 1;
+      const showNoon = p.freq >= 2;
+      const showEvening = p.freq >= 3;
+      let progressHtml = '';
+      if (p.duration > 0) {
+        const start = new Date(p.startDate);
+        const current = new Date(pDateStr);
+        const diffTime = Math.abs(current - start);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        const daysPassed = Math.min(diffDays + 1, p.duration);
+        const percent = (daysPassed / p.duration) * 100;
+        progressHtml = `<div class="pill-progress-wrap"><div class="pill-progress-bar" style="width: ${percent}%"></div></div><span class="pill-duration-text">день ${daysPassed} из ${p.duration}</span>`;
+      }
+      return `<tr>
+          <td><div>${escapeHtml(p.name)} ${personLabel}</div>${progressHtml}</td>
+          <td>${showMorning ? `<button class="pill-check ${dayData.morning ? 'checked' : ''}" onclick="togglePill(${p.id}, 'morning', '${pDateStr}')">${dayData.morning ? '✓' : ''}</button>` : '<span style="color:#eee">-</span>'}</td>
+          <td>${showNoon ? `<button class="pill-check ${dayData.noon ? 'checked' : ''}" onclick="togglePill(${p.id}, 'noon', '${pDateStr}')">${dayData.noon ? '✓' : ''}</button>` : '<span style="color:#eee">-</span>'}</td>
+          <td>${showEvening ? `<button class="pill-check ${dayData.evening ? 'checked' : ''}" onclick="togglePill(${p.id}, 'evening', '${pDateStr}')">${dayData.evening ? '✓' : ''}</button>` : '<span style="color:#eee">-</span>'}</td>
+          <td><button class="pill-del" onclick="askDeletePill(${p.id})" title="удалить">✕</button></td>
+        </tr>`;
+    }).join('');
+  }
+
+  function addPill() {
+    initAudio();
+    const input = document.getElementById('pillInput');
+    const person = document.getElementById('pillPerson').value;
+    const freq = parseInt(document.getElementById('pillFrequency').value);
+    const duration = parseInt(document.getElementById('pillDuration').value);
+    const name = input.value.trim();
+    if (!name) return;
+    state.pills.push({ id: Date.now(), name, person, freq, startDate: todayKey(), duration: duration });
+    input.value = '';
+    playSound('click');
+    save();
+    renderPills();
+  }
+
+  function askDeletePill(id) {
+    deletingPillId = id;
+    document.getElementById('confirmDeleteModal').classList.add('open');
+  }
+  function closeConfirmDelete() {
+    document.getElementById('confirmDeleteModal').classList.remove('open');
+    deletingPillId = null;
+  }
+  function confirmDelete() {
+    if (!deletingPillId) return;
+    state.pills = state.pills.filter(p => p.id !== deletingPillId);
+    for (const day in state.pillsDone) { delete state.pillsDone[day][deletingPillId]; }
+    save();
+    closeConfirmDelete();
+    playSound('click');
+    renderPills();
+  }
+
+  function togglePill(id, timeOfDay, dateStr) {
+    initAudio();
+    const pill = state.pills.find(p => p.id === id);
+    if (!pill) return;
+    if (!state.pillsDone[dateStr]) state.pillsDone[dateStr] = {};
+    if (!state.pillsDone[dateStr][id]) state.pillsDone[dateStr][id] = {};
+    state.pillsDone[dateStr][id][timeOfDay] = !state.pillsDone[dateStr][id][timeOfDay];
+    playSound('click');
+    save();
+    renderPills();
+    if (pill.duration > 0) {
+      const start = new Date(pill.startDate);
+      const end = new Date(start); end.setDate(end.getDate() + pill.duration - 1);
+      const currentDate = new Date(dateStr);
+      if (currentDate >= end) {
+        const todayDone = state.pillsDone[dateStr][id] || {};
+        const totalDone = Object.values(todayDone).filter(v => v).length;
+        if (totalDone >= pill.freq) {
+          setTimeout(() => {
+            showCongrats('мы закончили это пить!', `курс "${pill.name}" успешно завершен. он удален из списка.`);
+            state.pills = state.pills.filter(p => p.id !== id);
+            for (const day in state.pillsDone) { delete state.pillsDone[day][id]; }
+            save(); renderPills();
+          }, 300);
+        }
+      }
+    }
+  }
+
+  function renderMood() {
+    const grid = document.getElementById('moodGrid');
+    const todayStr = todayKey();
+    const currentMonth = viewDate.getMonth();
+    const currentYear = viewDate.getFullYear();
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    document.getElementById('moodMonthTitle').textContent = MONTHS_EN[currentMonth];
+    let html = '';
+    let moodCounts = {};
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      const moodId = state.mood[dateStr];
+      const moodData = MOODS.find(m => m.id === moodId);
+      const isToday = dateStr === todayStr;
+      const hasNote = state.notes[dateStr] && state.notes[dateStr].trim() !== '';
+      if (moodId) moodCounts[moodId] = (moodCounts[moodId] || 0) + 1;
+      const colorStyle = moodData ? `background-color: ${moodData.color}; border-color: ${moodData.color};` : '';
+      html += `<div class="day-card ${isToday ? 'today' : ''}" style="justify-content: center;">
+        <span class="day-num">${day}</span>
+        <div class="mood-circle ${moodData ? 'filled' : ''}" style="${colorStyle}" onclick="openMoodSelect('${dateStr}')"></div>
+        <button class="note-btn ${hasNote ? 'has-note' : ''}" onclick="openNote('${dateStr}', ${day})" title="заметка">✎</button>
+      </div>`;
+    }
+    grid.innerHTML = html;
+    let summaryText = 'в этом месяце ты пока не отмечала настроение.';
+    let quoteText = '';
+    let maxMoodId = null; let maxCount = 0;
+    for (const [mId, count] of Object.entries(moodCounts)) {
+      if (count > maxCount) { maxCount = count; maxMoodId = mId; }
+    }
+    if (maxMoodId) {
+      const moodData = MOODS.find(m => m.id === maxMoodId);
+      summaryText = `в этом месяце в большинство дней ты была ${moodData.adj}.`;
+      quoteText = moodData.quote;
+    }
+    document.getElementById('moodSummary').innerHTML = `<h3>итоги месяца</h3><p>${summaryText}</p>${quoteText ? `<p class="quote">"${quoteText}"</p>` : ''}`;
+  }
+
+  function openMoodSelect(dateStr) {
+    initAudio();
+    selectingMoodDate = dateStr;
+    const list = document.getElementById('moodOptionsList');
+    list.innerHTML = MOODS.map(m => `<button class="mood-opt-btn" style="background-color: ${m.color};" onclick="setMood('${m.id}')">${m.label}</button>`).join('');
+    document.getElementById('moodSelectModal').classList.add('open');
+  }
+  function closeMoodSelect() {
+    document.getElementById('moodSelectModal').classList.remove('open');
+    selectingMoodDate = null;
+  }
+  function setMood(moodId) {
+    if (!selectingMoodDate) return;
+    if (state.mood[selectingMoodDate] === moodId) delete state.mood[selectingMoodDate];
+    else state.mood[selectingMoodDate] = moodId;
+    playSound('click');
+    save();
+    closeMoodSelect();
+    renderMood();
+  }
+
+  function openNote(dateStr, dayNum) {
+    editingNoteDate = dateStr;
+    document.getElementById('modalDateTitle').textContent = `заметка на ${dayNum} число`;
+    document.getElementById('modalNoteText').value = state.notes[dateStr] || '';
+    document.getElementById('noteModal').classList.add('open');
+  }
+  function closeNote() {
+    document.getElementById('noteModal').classList.remove('open');
+    editingNoteDate = null;
+  }
+  function saveNote() {
+    if (!editingNoteDate) return;
+    const text = document.getElementById('modalNoteText').value.trim();
+    if (text) state.notes[editingNoteDate] = text;
+    else delete state.notes[editingNoteDate];
+    save(); closeNote(); renderMood();
+  }
+
+  function showCongrats(title, text) {
+    document.getElementById('congratsTitle').textContent = title;
+    document.getElementById('congratsText').textContent = text;
+    document.getElementById('congratsModal').classList.add('open');
+    playSound('success');
+  }
+  function closeCongrats() { document.getElementById('congratsModal').classList.remove('open'); }
+
+  // --- ЭКСПОРТ / ИМПОРТ ---
+  function exportData() {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
+    const downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", "my_soft_tracker_backup.json");
+    document.body.appendChild(downloadAnchorNode);
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+    playSound('success');
+  }
+
+  function importData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const imported = JSON.parse(e.target.result);
+        state = Object.assign(defaultState(), imported);
+        save();
+        renderWater();
+        renderPills();
+        renderSport();
+        renderMood();
+        showCongrats('данные загружены!', 'все твои записи успешно перенесены на это устройство.');
+      } catch (err) {
+        alert('ошибка: файл поврежден или выбран не тот файл.');
+      }
+    };
+    reader.readAsText(file);
+    event.target.value = '';
+  }
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  document.getElementById('pillInput').addEventListener('keydown', e => { if (e.key === 'Enter') addPill(); });
+
+  renderWater();
+  renderPills();
+  renderSport();
+</script>
+</body>
+</html>
