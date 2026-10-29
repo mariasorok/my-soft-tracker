@@ -245,10 +245,10 @@
   .modal-btn.save { background: var(--pink-main); color: white; }
   .modal-btn.ok { background: var(--pink-main); color: white; padding: 12px 30px; font-size: 16px; }
 
-  /* --- АДАПТАЦИЯ ПОД ТЕЛЕФОН (MEDIA QUERIES) --- */
+  /* --- АДАПТАЦИЯ ПОД ТЕЛЕФОН (УВЕЛИЧЕННЫЕ ЭЛЕМЕНТЫ) --- */
   @media (max-width: 600px) {
     body {
-      padding: 16px 8px 40px;
+      padding: 16px 12px 40px;
     }
     
     h1 {
@@ -257,14 +257,14 @@
     }
 
     .tabs {
-      gap: 4px;
+      gap: 6px;
       margin-bottom: 16px;
     }
 
     .tab-btn {
-      font-size: 13px;
-      padding: 8px 12px;
-      flex: 1 1 40%;
+      font-size: 14px;
+      padding: 12px 16px;
+      flex: 1 1 45%;
       text-align: center;
     }
 
@@ -282,75 +282,94 @@
       min-width: 120px;
     }
 
+    /* Одна колонка на телефоне */
     .days-grid {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
+      grid-template-columns: 1fr;
+      gap: 10px;
     }
 
     .day-card {
-      padding: 10px 8px;
-      gap: 6px;
-      border-radius: 12px;
+      padding: 16px 12px;
+      gap: 16px;
+      border-radius: 16px;
     }
 
     .day-num {
-      font-size: 14px;
-      min-width: 18px;
+      font-size: 18px;
+      min-width: 24px;
     }
 
+    /* УВЕЛИЧЕННЫЕ КАПЛИ ВОДЫ */
     .drops-grid {
-      gap: 4px;
+      gap: 8px;
+      flex: 1; 
+      justify-content: space-between;
     }
 
     .drop {
-      width: 18px;
-      height: 18px;
-      border-width: 2px;
+      width: 32px;
+      height: 32px;
+      border-width: 3px;
     }
     
     .mood-circle {
-      width: 20px;
-      height: 20px;
+      width: 32px;
+      height: 32px;
+      flex: 1;
+      max-width: 40px;
     }
 
     .note-btn {
-      bottom: 4px;
-      right: 4px;
-      font-size: 12px;
+      bottom: 8px;
+      right: 8px;
+      font-size: 16px;
     }
 
-    /* Таблица спорта на телефоне */
+    /* Таблица спорта */
     .sport-table th, .sport-table td {
-      padding: 8px 2px;
-      font-size: 11px;
+      padding: 12px 4px;
+      font-size: 13px;
     }
     
     .sport-check {
-      width: 20px;
-      height: 20px;
-      font-size: 11px;
+      width: 32px;
+      height: 32px;
+      font-size: 16px;
     }
 
-    /* Таблица таблеток на телефоне */
+    /* Таблица таблеток */
     .pill-table th, .pill-table td {
-      padding: 8px 4px;
-      font-size: 13px;
+      padding: 12px 4px;
+      font-size: 14px;
     }
 
     .pill-check {
-      width: 24px;
-      height: 24px;
-      font-size: 12px;
+      width: 32px;
+      height: 32px;
+      font-size: 16px;
+    }
+
+    .pill-del {
+      font-size: 24px;
+      padding: 8px;
     }
 
     .who-badge {
-      font-size: 10px;
-      padding: 2px 6px;
-      margin-left: 4px;
+      font-size: 11px;
+      padding: 4px 8px;
+      margin-left: 6px;
+      display: block;
+      width: fit-content;
+      margin-top: 4px;
     }
 
     .pill-add-box {
-      padding: 12px;
+      padding: 16px;
+    }
+    
+    .pill-add-box input, .pill-add-box select, .pill-add-box button {
+      font-size: 16px; /* Предотвращает автозум в Safari */
+      padding: 14px;
     }
 
     .monthly-summary {
@@ -363,16 +382,18 @@
     }
     
     .monthly-summary p {
-      font-size: 14px;
+      font-size: 15px;
     }
 
     .footer {
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
     }
     
     .btn-outline {
       width: 100%;
+      padding: 14px;
+      font-size: 15px;
     }
   }
 </style>
@@ -531,7 +552,7 @@
 </div>
 
 <script>
-  const STORAGE_KEY = 'soft-tracker-v15';
+  const STORAGE_KEY = 'soft-tracker-v16';
   let state = load();
   let editingNoteDate = null;
   let selectingMoodDate = null;
