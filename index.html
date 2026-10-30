@@ -6,7 +6,7 @@
 <title>my soft tracker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg-color: #fcf6f6;
@@ -42,10 +42,42 @@
     flex-direction: column;
   }
 
-  .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding: 0 4px; }
-  .clock-container { font-family: var(--font-hand); font-size: 38px; color: var(--text-main); }
-  .settings-btn { background: transparent; border: none; font-size: 28px; cursor: pointer; opacity: 0.6; transition: opacity 0.2s; }
+  /* Верхняя панель */
+  .top-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  
+  .top-bar { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    padding: 0 4px; 
+  }
+  
+  .clock-container { 
+    font-family: var(--font-hand); 
+    font-size: 38px; 
+    color: var(--text-main); 
+  }
+  
+  .settings-btn { background: transparent; border: none; cursor: pointer; opacity: 0.5; transition: opacity 0.2s; padding: 4px; }
   .settings-btn:hover { opacity: 1; }
+  .settings-btn svg { width: 28px; height: 28px; stroke: var(--text-main); stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* Аффирмация (тонкая и ненавязчивая) */
+  .affirmation-top {
+    text-align: center;
+    font-family: var(--font-sans);
+    font-weight: 300;
+    font-size: 14px;
+    color: #b89b9b; /* приглушенный розово-серый */
+    letter-spacing: 0.5px;
+    font-style: italic;
+    padding: 0 10px;
+  }
 
   .tabs { display: flex; justify-content: center; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
   .tab-btn { font-family: var(--font-sans); font-weight: 600; font-size: 15px; padding: 10px 20px; border: 2px solid transparent; border-radius: 20px; background: transparent; color: var(--text-light); cursor: pointer; transition: all 0.2s; }
@@ -79,10 +111,10 @@
   .drop.full { border-color: var(--blue-dark); animation: pop 0.3s ease; }
   @keyframes pop { 0% { transform: rotate(-45deg) scale(0.8); } 50% { transform: rotate(-45deg) scale(1.15); } 100% { transform: rotate(-45deg) scale(1); } }
 
-  .sport-table { width: 100%; border-collapse: collapse; margin-top: 10px; text-align: center; }
-  .sport-table th { font-family: var(--font-sans); font-weight: 600; font-size: 12px; color: var(--text-light); padding: 12px 4px; border-bottom: 2px solid var(--border-color); }
-  .sport-table th:first-child { text-align: left; padding-left: 10px; }
-  .sport-table td { padding: 10px 6px; border-bottom: 1px dashed var(--border-color); font-size: 15px; font-weight: 600; color: var(--text-main); }
+  .sport-table { width: 100%; border-collapse: collapse; margin-top: 10px; table-layout: fixed; text-align: center; }
+  .sport-table th { font-family: var(--font-sans); font-weight: 600; font-size: 12px; color: var(--text-light); padding: 12px 2px; border-bottom: 2px solid var(--border-color); word-wrap: break-word; }
+  .sport-table th:first-child { text-align: left; padding-left: 10px; width: 50px; }
+  .sport-table td { padding: 10px 2px; border-bottom: 1px dashed var(--border-color); font-size: 15px; font-weight: 600; color: var(--text-main); }
   .sport-table td:first-child { text-align: left; padding-left: 10px; }
   .sport-check { width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--green-main); cursor: pointer; transition: all 0.15s; background: transparent; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; margin: 0 auto; }
   .sport-check:hover { background: var(--green-light); }
@@ -97,11 +129,13 @@
   .pill-check.checked { background: var(--pink-main); animation: pop 0.3s ease; }
   .pill-del { background: none; border: none; color: var(--text-light); cursor: pointer; font-size: 18px; padding: 4px 8px; transition: color 0.2s; }
   .pill-del:hover { color: var(--pink-dark); }
-  .pill-add-box { display: flex; flex-direction: column; gap: 12px; background: var(--bg-color); padding: 16px; border-radius: 16px; }
-  .pill-add-box input, .pill-add-box select { padding: 12px; border: 2px solid var(--border-color); border-radius: 12px; font-family: var(--font-sans); font-size: 14px; outline: none; background: white; }
+  
+  .pill-add-box { display: flex; flex-direction: column; gap: 12px; background: var(--bg-color); padding: 16px; border-radius: 16px; width: 100%; }
+  .pill-add-box input, .pill-add-box select { width: 100%; padding: 12px; border: 2px solid var(--border-color); border-radius: 12px; font-family: var(--font-sans); font-size: 14px; outline: none; background: white; }
   .pill-add-box input:focus, .pill-add-box select:focus { border-color: var(--pink-main); }
-  .pill-add-box button { padding: 12px; border: none; border-radius: 12px; background: var(--pink-main); color: white; font-family: var(--font-sans); font-weight: 700; font-size: 16px; cursor: pointer; transition: background 0.2s; }
+  .pill-add-box button { width: 100%; padding: 12px; border: none; border-radius: 12px; background: var(--pink-main); color: white; font-family: var(--font-sans); font-weight: 700; font-size: 16px; cursor: pointer; transition: background 0.2s; }
   .pill-add-box button:hover { background: var(--pink-dark); }
+
   .who-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-left: 8px; }
   .who-me { background: var(--pink-light); color: var(--pink-dark); }
   .who-kid { background: var(--green-light); color: var(--green-main); }
@@ -121,7 +155,6 @@
   .monthly-summary p { font-size: 15px; color: var(--text-main); line-height: 1.5; }
   .monthly-summary .quote { font-style: italic; color: var(--text-light); margin-top: 12px; font-size: 14px; }
 
-  /* --- ПЛАНЫ --- */
   .plans-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
   .plan-item { display: flex; align-items: center; gap: 12px; padding: 16px; background: var(--bg-color); border-radius: 16px; border: 2px solid transparent; cursor: pointer; transition: all 0.2s; }
   .plan-item:hover { border-color: var(--border-color); }
@@ -131,8 +164,8 @@
   .plan-text { flex: 1; font-size: 16px; font-weight: 600; }
   .plan-del { background: none; border: none; color: var(--text-light); font-size: 18px; cursor: pointer; padding: 4px; }
   .plan-del:hover { color: #ef4444; }
-  .plans-add-box { display: flex; gap: 8px; }
-  .plans-add-box input { flex: 1; padding: 14px; border: 2px solid var(--border-color); border-radius: 12px; font-family: var(--font-sans); font-size: 16px; outline: none; }
+  .plans-add-box { display: flex; gap: 8px; width: 100%; }
+  .plans-add-box input { flex: 1; padding: 14px; border: 2px solid var(--border-color); border-radius: 12px; font-family: var(--font-sans); font-size: 16px; outline: none; width: 100%; }
   .plans-add-box input:focus { border-color: var(--pink-main); }
   .plans-add-box button { padding: 0 20px; border: none; border-radius: 12px; background: var(--pink-main); color: white; font-weight: 700; font-size: 20px; cursor: pointer; }
 
@@ -163,7 +196,7 @@
     body { padding: 16px 12px 40px; }
     .clock-container { font-size: 32px; }
     .tabs { gap: 6px; margin-bottom: 16px; }
-    .tab-btn { font-size: 13px; padding: 12px 14px; flex: 1 1 45%; text-align: center; }
+    .tab-btn { font-size: 12px; padding: 10px 12px; flex: 1 1 30%; text-align: center; }
     .card { padding: 16px; border-radius: 20px; }
     .title { font-size: 26px; }
     .month-nav .title { font-size: 20px !important; min-width: 120px; }
@@ -174,13 +207,12 @@
     .drop { width: 24px; height: 24px; border-width: 2.5px; }
     .mood-circle { width: 26px; height: 26px; flex: 1; max-width: 30px; }
     .note-btn { bottom: 6px; right: 6px; font-size: 14px; }
-    .sport-table th, .sport-table td { padding: 12px 2px; font-size: 11px; }
-    .sport-check { width: 28px; height: 28px; font-size: 14px; }
-    .pill-table th, .pill-table td { padding: 12px 4px; font-size: 13px; }
-    .pill-check { width: 32px; height: 32px; font-size: 16px; }
-    .pill-del { font-size: 24px; padding: 8px; }
-    .who-badge { font-size: 11px; padding: 4px 8px; margin-left: 6px; display: block; width: fit-content; margin-top: 4px; }
-    .pill-add-box { padding: 16px; }
+    .sport-table th, .sport-table td { padding: 10px 2px; font-size: 11px; }
+    .sport-check { width: 26px; height: 26px; font-size: 13px; }
+    .pill-table th, .pill-table td { padding: 10px 4px; font-size: 13px; }
+    .pill-check { width: 28px; height: 28px; font-size: 14px; }
+    .pill-del { font-size: 20px; padding: 4px; }
+    .who-badge { font-size: 10px; padding: 2px 6px; margin-left: 4px; display: block; width: fit-content; margin-top: 4px; }
     .pill-add-box input, .pill-add-box select, .pill-add-box button { font-size: 16px; padding: 14px; }
     .monthly-summary { padding: 16px; margin-top: 16px; }
     .monthly-summary h3 { font-size: 24px; }
@@ -191,15 +223,27 @@
 
 <body>
 
-<div class="top-bar" id="mainTopBar">
-  <div class="clock-container" id="liveClock">--:--</div>
-  <button class="settings-btn" onclick="toggleSettings(true)" title="настройки">⚙️</button>
+<div class="top-section">
+  <div class="top-bar" id="mainTopBar">
+    <div class="clock-container" id="liveClock">--:--</div>
+    <button class="settings-btn" onclick="toggleSettings(true)" title="настройки">
+      <svg viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="3"></circle>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+      </svg>
+    </button>
+  </div>
+  
+  <!-- Аффирмация на день (по центру, тонкая) -->
+  <div class="affirmation-top" id="affirmationText">загрузка...</div>
 </div>
 
 <div class="screen" id="screen-settings">
   <div class="top-bar">
     <div class="clock-container">настройки</div>
-    <button class="settings-btn" onclick="toggleSettings(false)" title="закрыть">✖</button>
+    <button class="settings-btn" onclick="toggleSettings(false)" title="закрыть">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
   </div>
   <div class="card">
     <div class="settings-list">
@@ -220,34 +264,26 @@
 </div>
 
 <div id="mainTabs" class="tabs">
-  <button class="tab-btn active" onclick="switchTab('plans')">планы</button>
-  <button class="tab-btn" onclick="switchTab('water')">вода</button>
+  <button class="tab-btn active" onclick="switchTab('plans')">дела</button>
   <button class="tab-btn" onclick="switchTab('pills')">таблетки</button>
+  <button class="tab-btn" onclick="switchTab('water')">вода</button>
   <button class="tab-btn" onclick="switchTab('sport')">спорт</button>
   <button class="tab-btn" onclick="switchTab('mood')">настроение</button>
 </div>
 
-<!-- ЭКРАН ПЛАНЫ -->
+<!-- ЭКРАН ДЕЛА -->
 <div id="screen-plans" class="screen active">
   <div class="card">
+    <div class="month-nav">
+      <button onclick="changePlanDay(-1)">←</button>
+      <div class="title" id="planDateDisplay" style="font-size: 24px;">сегодня</div>
+      <button onclick="changePlanDay(1)">→</button>
+    </div>
     <div class="plans-list" id="plansList"></div>
     <div class="plans-add-box">
       <input type="text" id="planInput" placeholder="что нужно сделать?" />
       <button onclick="addPlan()">+</button>
     </div>
-  </div>
-</div>
-
-<!-- ЭКРАН ВОДА -->
-<div id="screen-water" class="screen">
-  <div class="card">
-    <div class="month-nav">
-      <button onclick="changeMonth('water', -1)">←</button>
-      <div class="title" id="waterMonthTitle">ноябрь</div>
-      <button onclick="changeMonth('water', 1)">→</button>
-    </div>
-    <div class="days-grid" id="waterGrid"></div>
-    <div class="monthly-summary" id="waterSummary"></div>
   </div>
 </div>
 
@@ -292,6 +328,19 @@
   </div>
 </div>
 
+<!-- ЭКРАН ВОДА -->
+<div id="screen-water" class="screen">
+  <div class="card">
+    <div class="month-nav">
+      <button onclick="changeMonth('water', -1)">←</button>
+      <div class="title" id="waterMonthTitle">ноябрь</div>
+      <button onclick="changeMonth('water', 1)">→</button>
+    </div>
+    <div class="days-grid" id="waterGrid"></div>
+    <div class="monthly-summary" id="waterSummary"></div>
+  </div>
+</div>
+
 <!-- ЭКРАН СПОРТ -->
 <div id="screen-sport" class="screen">
   <div class="card">
@@ -305,10 +354,10 @@
         <thead>
           <tr>
             <th>день</th>
-            <th>утренняя йога</th>
+            <th>йога утро</th>
             <th>тренировка</th>
             <th>спина</th>
-            <th>йога перед сном</th>
+            <th>йога вечер</th>
           </tr>
         </thead>
         <tbody id="sportTableBody"></tbody>
@@ -370,7 +419,7 @@
 </div>
 
 <script>
-  const STORAGE_KEY = 'soft-tracker-v24';
+  const STORAGE_KEY = 'soft-tracker-v27';
   let state = load();
   let editingNoteDate = null;
   let selectingMoodDate = null;
@@ -378,6 +427,7 @@
   
   let viewDate = new Date();
   let pillDate = new Date();
+  let planDate = new Date();
 
   const MOODS = [
     { id: 'energetic', label: 'энергичное', color: '#cdb4f6', adj: 'энергичной', quote: 'энергия - это то, что ты создаешь сама.' },
@@ -391,9 +441,19 @@
 
   const MONTHS_RU = ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'];
 
+  const AFFIRMATIONS = [
+    "я выбираю себя и свое спокойствие.", "я делаю все, что в моих силах, и этого достаточно.", "моя жизнь течет в правильном направлении.", "я позволяю себе отдыхать без чувства вины.", "каждый день я становлюсь чуточку счастливее.", "я отпускаю то, что не приносит мне радости.", "я достойна любви и заботы, особенно от самой себя.", "мой внутренний мир — это моя безопасная гавань.", "я принимаю свои эмоции, даже если они сложные.", "я верю в свой путь и свои силы.", "я создаю пространство для хороших перемен.", "маленькие шаги ведут к большим результатам.", "я благодарна своему телу за то, что оно меня носит.", "я не обязана быть идеальной, я просто должна быть собой.", "я выбираю мир в своей душе.", "я умею справляться с трудностями и становлюсь сильнее.", "сегодня я найду повод улыбнуться.", "я разрешаю себе быть там, где я сейчас нахожусь.", "я заслуживаю всего самого лучшего.", "мои границы важны и я их уважаю.", "я вдыхаю спокойствие, а выдыхаю напряжение.", "я — творец своей собственной жизни.", "я учусь на своих ошибках и двигаюсь дальше.", "я окружена заботой и поддержкой.", "я отпускаю контроль и доверяю течению жизни.", "я сильная, я справлюсь.", "я замечаю красоту в простых вещах.", "я делаю сегодня то, что скажет мне спасибо завтра.", "моя энергия направлена на то, что я могу изменить.", "я завершаю этот день с чувством благодарности.", "я начинаю новый месяц с чистого листа.",
+  ];
+
   function updateClock() {
     const now = new Date();
     document.getElementById('liveClock').textContent = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    
+    // Устанавливаем аффирмацию дня
+    const dayOfMonth = now.getDate();
+    const affirmationIndex = (dayOfMonth - 1) % AFFIRMATIONS.length;
+    const affEl = document.getElementById('affirmationText');
+    if (affEl) affEl.textContent = AFFIRMATIONS[affirmationIndex];
   }
   setInterval(updateClock, 1000);
   updateClock();
@@ -477,7 +537,7 @@
   }
   function todayKey() { return dateToKey(new Date()); }
 
-  function defaultState() { return { plans: [], water: {}, pills: [], pillsDone: {}, sport: {}, mood: {}, notes: {} }; }
+  function defaultState() { return { plans: {}, water: {}, pills: [], pillsDone: {}, sport: {}, mood: {}, notes: {} }; }
 
   function load() {
     try {
@@ -493,17 +553,17 @@
     const mainTabs = document.getElementById('mainTabs');
     const screens = document.querySelectorAll('.screen');
     const settingsScreen = document.getElementById('screen-settings');
-    const topBar = document.getElementById('mainTopBar');
+    const topSection = document.querySelector('.top-section');
 
     if (show) {
       mainTabs.style.display = 'none';
-      topBar.style.display = 'none';
+      topSection.style.display = 'none';
       screens.forEach(s => s.classList.remove('active'));
       settingsScreen.classList.add('active');
       settingsScreen.classList.add('screen');
     } else {
       mainTabs.style.display = 'flex';
-      topBar.style.display = 'flex';
+      topSection.style.display = 'flex';
       settingsScreen.classList.remove('active');
       switchTab('plans');
     }
@@ -514,7 +574,7 @@
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
     document.querySelectorAll('.screen').forEach(scr => scr.classList.remove('active'));
     const btns = document.querySelectorAll('.tab-btn');
-    ['plans', 'water', 'pills', 'sport', 'mood'].forEach((name, i) => {
+    ['plans', 'pills', 'water', 'sport', 'mood'].forEach((name, i) => {
       if (name === tabName) btns[i].classList.add('active');
     });
     document.getElementById('screen-' + tabName).classList.add('active');
@@ -554,18 +614,30 @@
     renderPills();
   }
 
-  // --- ПЛАНЫ ---
+  function changePlanDay(direction) {
+    playSound('click');
+    planDate.setDate(planDate.getDate() + direction);
+    renderPlans();
+  }
+
+    // --- ДЕЛА ---
   function renderPlans() {
     const list = document.getElementById('plansList');
-    if (state.plans.length === 0) {
-      list.innerHTML = `<div style="text-align:center; padding: 20px; color: var(--text-light); font-style: italic;">все дела переделаны!</div>`;
+    const pDateStr = dateToKey(planDate);
+    const todayStr = todayKey();
+    document.getElementById('planDateDisplay').textContent = pDateStr === todayStr ? 'сегодня' : pDateStr;
+    
+    const dayPlans = state.plans[pDateStr] || [];
+    
+    if (dayPlans.length === 0) {
+      list.innerHTML = `<div style="text-align:center; padding: 20px; color: var(--text-light); font-style: italic;">на этот день дел нет</div>`;
       return;
     }
-    list.innerHTML = state.plans.map(p => `
-      <div class="plan-item ${p.done ? 'done' : ''}" onclick="togglePlan(${p.id})">
+    list.innerHTML = dayPlans.map((p, index) => `
+      <div class="plan-item ${p.done ? 'done' : ''}" onclick="togglePlan('${pDateStr}', ${index})">
         <div class="plan-check">${p.done ? '✓' : ''}</div>
         <div class="plan-text">${escapeHtml(p.text)}</div>
-        <button class="plan-del" onclick="deletePlan(event, ${p.id})">✕</button>
+        <button class="plan-del" onclick="deletePlan(event, '${pDateStr}', ${index})">✕</button>
       </div>
     `).join('');
   }
@@ -573,30 +645,34 @@
   function addPlan() {
     const input = document.getElementById('planInput');
     const text = input.value.trim();
+    const pDateStr = dateToKey(planDate);
     if (!text) return;
-    state.plans.push({ id: Date.now(), text, done: false });
+    if (!state.plans[pDateStr]) state.plans[pDateStr] = [];
+    state.plans[pDateStr].push({ text, done: false });
     input.value = '';
     playSound('click');
     save();
     renderPlans();
   }
 
-  function togglePlan(id) {
-    const plan = state.plans.find(p => p.id === id);
-    if (plan) {
-      plan.done = !plan.done;
+  function togglePlan(dateStr, index) {
+    if (state.plans[dateStr] && state.plans[dateStr][index]) {
+      state.plans[dateStr][index].done = !state.plans[dateStr][index].done;
       playSound('click');
       save();
       renderPlans();
     }
   }
 
-  function deletePlan(event, id) {
+  function deletePlan(event, dateStr, index) {
     event.stopPropagation();
-    state.plans = state.plans.filter(p => p.id !== id);
-    playSound('click');
-    save();
-    renderPlans();
+    if (state.plans[dateStr]) {
+      state.plans[dateStr].splice(index, 1);
+      if (state.plans[dateStr].length === 0) delete state.plans[dateStr];
+      playSound('click');
+      save();
+      renderPlans();
+    }
   }
 
   // --- ВОДА ---
@@ -819,7 +895,7 @@
       const hasNote = state.notes[dateStr] && state.notes[dateStr].trim() !== '';
       if (moodId) moodCounts[moodId] = (moodCounts[moodId] || 0) + 1;
       const colorStyle = moodData ? `background-color: ${moodData.color}; border-color: ${moodData.color};` : '';
-      html += `<div class="day-card ${isToday ? 'today' : ''}" style="justify-content: center;">
+      html += `<div class="day-card ${isToday ? 'today' : ''}">
         <span class="day-num">${day}</span>
         <div class="mood-circle ${moodData ? 'filled' : ''}" style="${colorStyle}" onclick="openMoodSelect('${dateStr}')"></div>
         <button class="note-btn ${hasNote ? 'has-note' : ''}" onclick="openNote('${dateStr}', ${day})" title="заметка">✎</button>
