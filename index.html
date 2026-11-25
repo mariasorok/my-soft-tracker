@@ -7,7 +7,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#eba5ad">
 <style>
-    @font-face {
+  @font-face {
     font-family: 'Caveat';
     src: url('caveat-v23-cyrillic_latin-600.woff2') format('woff2');
     font-weight: 600;
@@ -129,28 +129,35 @@
   .month-nav button:hover { color: var(--pink-dark); }
   .month-nav .title { margin: 0; min-width: 150px; text-align: center; }
 
-    .days-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+  .days-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
   
   .day-card {
-    border: 2px solid var(--border-color); border-radius: 16px; padding: 12px 12px 12px 8px;
+    border: 2px solid var(--border-color); border-radius: 16px; padding: 12px;
     position: relative; background: #fffdfd; transition: all 0.2s;
-    display: flex; align-items: center; justify-content: space-between; gap: 4px;
+    display: flex; align-items: center; gap: 8px;
   }
+  .day-card.day-has-note {
+    background-color: #fffdfd;
+    border-color: var(--pink-light);
+  }
+  .day-card:active { transform: scale(0.98); }
+  .day-card.today { border-color: var(--pink-main); background: #fffafb; }
+  .day-num { font-family: var(--font-sans); font-weight: 700; font-size: 16px; color: var(--text-main); min-width: 24px; text-align: center; }
 
   .drops-grid { 
     display: grid; 
-    grid-template-columns: repeat(4, 22px); 
-    gap: 6px; 
+    grid-template-columns: repeat(4, 18px);
+    gap: 4px; 
     justify-content: center; 
     align-items: center;
+    margin-left: auto;
+    margin-right: 4px;
   }
-  
   .drop {
-    width: 22px; height: 22px; border-radius: 50% 50% 50% 0;
-    transform: rotate(-45deg); border: 2.5px solid var(--blue-main);
+    width: 18px; height: 18px; border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg); border: 2px solid var(--blue-main);
     cursor: pointer; transition: all 0.15s; background: transparent;
     position: relative; overflow: hidden;
-    flex-shrink: 0; /* запрещает капельке сжиматься или растягиваться */
   }
   .drop:hover { background: var(--blue-light); }
   .drop .water-fill {
@@ -215,13 +222,13 @@
     width: 24px; height: 24px; border-radius: 50%;
     border: 2px solid var(--border-color); background: white;
     display: inline-block; cursor: pointer; transition: all 0.15s;
-    margin: 0 auto;
+    margin: 0 auto; flex-shrink: 0;
   }
   .mood-circle:hover { border-color: var(--text-light); }
   .mood-circle.filled { animation: pop 0.3s ease; }
 
   .note-btn {
-    position: absolute; bottom: 10px; right: 10px; font-size: 14px;
+    position: absolute; bottom: 8px; right: 8px; font-size: 16px;
     color: var(--text-light); cursor: pointer; transition: color 0.2s;
     background: none; border: none; padding: 4px;
   }
@@ -232,7 +239,7 @@
     margin-top: 24px; padding: 20px; background: var(--bg-color);
     border-radius: 16px; text-align: center; border: 2px dashed var(--border-color);
   }
-  .monthly-summary h3 { font-family: var(--font-hand); font-size: 28px; color: var(--pink-dark); margin-bottom: 8px; }
+  .monthly-summary h3 { font-family: var(--font-hand); font-size: 28px; color: var(--pink-dark); margin-bottom: 8px; line-height: 1.2; }
   .monthly-summary p { font-size: 15px; color: var(--text-main); line-height: 1.5; }
   .monthly-summary .quote { font-style: italic; color: var(--text-light); margin-top: 12px; font-size: 14px; }
 
@@ -310,9 +317,17 @@
 
 <div id="screen-pills" class="screen">
   <div class="card">
-    <div class="title" style="margin-bottom: 16px;">таблетки</div>
-    
-    <div class="pill-add-box">
+    <div class="month-nav" style="margin-bottom: 24px;">
+      <button onclick="changePillDay(-1)">←</button>
+      <div class="title" id="pillDateDisplay" style="font-size: 24px;">сегодня</div>
+      <button onclick="changePillDay(1)">→</button>
+    </div>
+
+    <table class="pill-table">
+      <tbody id="pillsTableBody"></tbody>
+    </table>
+
+    <div class="pill-add-box" style="margin-top: 24px; margin-bottom: 0;">
       <select id="pillPerson">
         <option value="me">для меня</option>
         <option value="kid">для Кирочки</option>
@@ -334,25 +349,6 @@
       </div>
       <button onclick="addPill()">добавить</button>
     </div>
-
-    <div class="month-nav">
-      <button onclick="changePillDay(-1)">←</button>
-      <div class="title" id="pillDateDisplay" style="font-size: 24px;">сегодня</div>
-      <button onclick="changePillDay(1)">→</button>
-    </div>
-
-    <table class="pill-table">
-      <thead>
-        <tr>
-          <th>лекарство</th>
-          <th>утро</th>
-          <th>день</th>
-          <th>вечер</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody id="pillsTableBody"></tbody>
-    </table>
   </div>
 </div>
 
@@ -522,6 +518,10 @@
     if (tabName === 'sport') renderSport();
     if (tabName === 'water') renderWater();
     if (tabName === 'pills') renderPills();
+    
+    if (tabName === 'water' || tabName === 'sport' || tabName === 'mood') {
+      scrollToToday();
+    }
   }
 
   function changeMonth(section, direction) {
@@ -559,7 +559,6 @@
       
       html += `<div class="day-card ${isToday ? 'today' : ''} ${isDone ? 'done' : ''}">
         <span class="day-num">${day}</span>
-        <span class="day-heart">♡</span>
         <div class="drops-grid">`;
       for (let i = 0; i < 8; i++) {
         const isFull = drops[i] === 1;
@@ -609,7 +608,7 @@
       const isToday = dateStr === todayStr;
       const doneCount = Object.values(sportData).filter(v => v === 1).length;
       if (doneCount === 4) daysWithAllSport++;
-      html += `<tr style="${isToday ? 'background-color: var(--green-light);' : ''}"><td>${day}</td>`;
+      html += `<tr class="${isToday ? 'today-row' : ''}" style="${isToday ? 'background-color: var(--green-light);' : ''}"><td>${day}</td>`;
       SPORT_KEYS.forEach(key => {
         const isFull = sportData[key] === 1;
         html += `<td><div class="sport-check ${isFull ? 'full' : ''}" onclick="toggleSport('${dateStr}', '${key}')">${isFull ? '✓' : ''}</div></td>`;
@@ -642,11 +641,23 @@
     const today = todayKey();
     const pDateStr = dateToKey(pillDate);
     document.getElementById('pillDateDisplay').textContent = pDateStr === today ? 'сегодня' : pDateStr;
-    if (state.pills.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-light); font-style:italic; padding: 20px;">добавь первую таблетку выше</td></tr>`;
+    
+    // Фильтруем таблетки, чтобы показывать только актуальные на выбранную дату
+    const currentDateObj = new Date(pDateStr);
+    const activePills = state.pills.filter(p => {
+      if (p.duration === 0) return true; // бессрочные
+      const start = new Date(p.startDate);
+      const end = new Date(start);
+      end.setDate(end.getDate() + p.duration - 1);
+      return currentDateObj >= start && currentDateObj <= end;
+    });
+
+    if (activePills.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-light); font-style:italic; padding: 20px;">на этот день нет назначенных таблеток</td></tr>`;
       return;
     }
-    tbody.innerHTML = state.pills.map(p => {
+    
+    tbody.innerHTML = activePills.map(p => {
       const dayData = state.pillsDone[pDateStr]?.[p.id] || {};
       const personLabel = p.person === 'me' ? '<span class="who-badge who-me">я</span>' : '<span class="who-badge who-kid">Кирочка</span>';
       const showMorning = p.freq >= 1;
@@ -715,23 +726,6 @@
     playSound('click');
     save();
     renderPills();
-    if (pill.duration > 0) {
-      const start = new Date(pill.startDate);
-      const end = new Date(start); end.setDate(end.getDate() + pill.duration - 1);
-      const currentDate = new Date(dateStr);
-      if (currentDate >= end) {
-        const todayDone = state.pillsDone[dateStr][id] || {};
-        const totalDone = Object.values(todayDone).filter(v => v).length;
-        if (totalDone >= pill.freq) {
-          setTimeout(() => {
-            showCongrats('мы закончили это пить!', `курс "${pill.name}" успешно завершен. он удален из списка.`);
-            state.pills = state.pills.filter(p => p.id !== id);
-            for (const day in state.pillsDone) { delete state.pillsDone[day][id]; }
-            save(); renderPills();
-          }, 300);
-        }
-      }
-    }
   }
 
   function renderMood() {
@@ -751,7 +745,7 @@
       const hasNote = state.notes[dateStr] && state.notes[dateStr].trim() !== '';
       if (moodId) moodCounts[moodId] = (moodCounts[moodId] || 0) + 1;
       const colorStyle = moodData ? `background-color: ${moodData.color}; border-color: ${moodData.color};` : '';
-      html += `<div class="day-card ${isToday ? 'today' : ''}" style="justify-content: center;">
+      html += `<div class="day-card ${isToday ? 'today' : ''} ${hasNote ? 'day-has-note' : ''}" style="justify-content: center;">
         <span class="day-num">${day}</span>
         <div class="mood-circle ${moodData ? 'filled' : ''}" style="${colorStyle}" onclick="openMoodSelect('${dateStr}')"></div>
         <button class="note-btn ${hasNote ? 'has-note' : ''}" onclick="openNote('${dateStr}', ${day})" title="заметка">✎</button>
@@ -819,7 +813,6 @@
   }
   function closeCongrats() { document.getElementById('congratsModal').classList.remove('open'); }
 
-  // --- ЭКСПОРТ / ИМПОРТ ---
   function exportData() {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
     const downloadAnchorNode = document.createElement('a');
@@ -857,11 +850,21 @@
     return String(str).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   }
 
+  function scrollToToday() {
+    setTimeout(() => {
+      const todayCard = document.querySelector('.day-card.today, .today-row');
+      if (todayCard) {
+        todayCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 300);
+  }
+
   document.getElementById('pillInput').addEventListener('keydown', e => { if (e.key === 'Enter') addPill(); });
 
   renderWater();
   renderPills();
   renderSport();
+  scrollToToday();
 </script>
 <script>
   if ('serviceWorker' in navigator) {
@@ -870,6 +873,5 @@
     });
   }
 </script>
-</body>
 </body>
 </html>
