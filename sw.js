@@ -1,4 +1,4 @@
-const CACHE_NAME = 'soft-tracker-v1';
+const CACHE_NAME = 'soft-tracker-v2';
 const ASSETS = [
   './',
   './index.html',
