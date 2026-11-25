@@ -129,12 +129,12 @@
   .month-nav button:hover { color: var(--pink-dark); }
   .month-nav .title { margin: 0; min-width: 150px; text-align: center; }
 
-  .days-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+  .days-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
   
   .day-card {
     border: 2px solid var(--border-color); border-radius: 16px; padding: 12px;
     position: relative; background: #fffdfd; transition: all 0.2s;
-    display: flex; align-items: center; gap: 8px;
+    display: flex; align-items: center; justify-content: center; gap: 8px; /* Капельки будут по центру */
   }
   .day-card.day-has-note {
     background-color: #fffdfd;
@@ -142,7 +142,7 @@
   }
   .day-card:active { transform: scale(0.98); }
   .day-card.today { border-color: var(--pink-main); background: #fffafb; }
-  .day-num { font-family: var(--font-sans); font-weight: 700; font-size: 16px; color: var(--text-main); min-width: 24px; text-align: center; }
+  .day-num { font-family: var(--font-sans); font-weight: 700; font-size: 16px; color: var(--text-main); min-width: 20px; text-align: center; }
 
   .drops-grid { 
     display: grid; 
@@ -150,8 +150,6 @@
     gap: 4px; 
     justify-content: center; 
     align-items: center;
-    margin-left: auto;
-    margin-right: 4px;
   }
   .drop {
     width: 18px; height: 18px; border-radius: 50% 50% 50% 0;
@@ -227,13 +225,18 @@
   .mood-circle:hover { border-color: var(--text-light); }
   .mood-circle.filled { animation: pop 0.3s ease; }
 
+  /* Увеличенный карандашик */
   .note-btn {
-    position: absolute; bottom: 8px; right: 8px; font-size: 16px;
-    color: var(--text-light); cursor: pointer; transition: color 0.2s;
-    background: none; border: none; padding: 4px;
+    position: absolute; bottom: 6px; right: 6px; font-size: 20px;
+    color: var(--text-light); cursor: pointer; transition: all 0.2s;
+    background: none; border: none; padding: 4px; border-radius: 50%;
   }
   .note-btn:hover { color: var(--pink-dark); }
-  .note-btn.has-note { color: var(--pink-dark); }
+  .note-btn.has-note { 
+    color: var(--pink-dark); 
+    background-color: var(--pink-light);
+    transform: scale(1.1);
+  }
 
   .monthly-summary {
     margin-top: 24px; padding: 20px; background: var(--bg-color);
@@ -642,10 +645,9 @@
     const pDateStr = dateToKey(pillDate);
     document.getElementById('pillDateDisplay').textContent = pDateStr === today ? 'сегодня' : pDateStr;
     
-    // Фильтруем таблетки, чтобы показывать только актуальные на выбранную дату
     const currentDateObj = new Date(pDateStr);
     const activePills = state.pills.filter(p => {
-      if (p.duration === 0) return true; // бессрочные
+      if (p.duration === 0) return true;
       const start = new Date(p.startDate);
       const end = new Date(start);
       end.setDate(end.getDate() + p.duration - 1);
@@ -856,7 +858,7 @@
       if (todayCard) {
         todayCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
-    }, 300);
+    }, 500); // Небольшая задержка, чтобы Safari успел отрисовать страницу
   }
 
   document.getElementById('pillInput').addEventListener('keydown', e => { if (e.key === 'Enter') addPill(); });
