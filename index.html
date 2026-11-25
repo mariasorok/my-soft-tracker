@@ -129,7 +129,7 @@
   .month-nav button:hover { color: var(--pink-dark); }
   .month-nav .title { margin: 0; min-width: 150px; text-align: center; }
 
-  .days-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; }
+  .days-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
   .day-card {
     border: 2px solid var(--border-color); border-radius: 16px; padding: 12px;
     position: relative; background: #fffdfd; transition: all 0.2s;
@@ -141,12 +141,19 @@
   .day-heart { position: absolute; top: 8px; right: 10px; font-size: 12px; color: var(--border-color); }
   .day-card.done .day-heart { color: var(--pink-main); }
 
-  .drops-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; justify-items: center; }
+    .drops-grid { 
+    display: grid; 
+    grid-template-columns: repeat(4, 22px); 
+    gap: 6px; 
+    justify-content: center; 
+    align-items: center;
+  }
   .drop {
     width: 22px; height: 22px; border-radius: 50% 50% 50% 0;
     transform: rotate(-45deg); border: 2.5px solid var(--blue-main);
     cursor: pointer; transition: all 0.15s; background: transparent;
     position: relative; overflow: hidden;
+    flex-shrink: 0; /* запрещает капельке сжиматься или растягиваться */
   }
   .drop:hover { background: var(--blue-light); }
   .drop .water-fill {
