@@ -144,16 +144,16 @@
   .day-card.today { border-color: var(--pink-main); background: #fffafb; }
   .day-num { font-family: var(--font-sans); font-weight: 700; font-size: 16px; color: var(--text-main); min-width: 20px; text-align: center; }
 
-  .drops-grid { 
+    .drops-grid { 
     display: grid; 
-    grid-template-columns: repeat(4, 18px);
+    grid-template-columns: repeat(4, 22px); /* Увеличили с 18px до 22px */
     gap: 4px; 
     justify-content: center; 
     align-items: center;
   }
   .drop {
-    width: 18px; height: 18px; border-radius: 50% 50% 50% 0;
-    transform: rotate(-45deg); border: 2px solid var(--blue-main);
+    width: 22px; height: 22px; border-radius: 50% 50% 50% 0; /* Увеличили */
+    transform: rotate(-45deg); border: 2.5px solid var(--blue-main); /* Чуть толще обводка */
     cursor: pointer; transition: all 0.15s; background: transparent;
     position: relative; overflow: hidden;
   }
@@ -853,12 +853,17 @@
   }
 
   function scrollToToday() {
+    // Ждем 700мс, чтобы вкладка успела полностью отрисоваться (особенно в Safari)
     setTimeout(() => {
-      const todayCard = document.querySelector('.day-card.today, .today-row');
-      if (todayCard) {
-        todayCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // Ищем карточку сегодняшнего дня (в воде/настроении) или строку (в спорте)
+      const todayElement = document.querySelector('.day-card.today, .today-row');
+      if (todayElement) {
+        // Считаем позицию элемента и скроллим окно напрямую (это надежнее, чем scrollIntoView)
+        const yOffset = -100; // Оставляем немного места сверху, чтобы было видно шапку
+        const y = todayElement.getBoundingClientRect().top + window.pageYOffset + yOffset;
+        window.scrollTo({ top: y, behavior: 'smooth' });
       }
-    }, 500); // Небольшая задержка, чтобы Safari успел отрисовать страницу
+    }, 700);
   }
 
   document.getElementById('pillInput').addEventListener('keydown', e => { if (e.key === 'Enter') addPill(); });
