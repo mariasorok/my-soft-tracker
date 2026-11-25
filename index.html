@@ -129,25 +129,22 @@
   .month-nav button:hover { color: var(--pink-dark); }
   .month-nav .title { margin: 0; min-width: 150px; text-align: center; }
 
-  .days-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+    .days-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+  
   .day-card {
-    border: 2px solid var(--border-color); border-radius: 16px; padding: 12px;
+    border: 2px solid var(--border-color); border-radius: 16px; padding: 12px 12px 12px 8px;
     position: relative; background: #fffdfd; transition: all 0.2s;
-    display: flex; align-items: center; gap: 12px;
+    display: flex; align-items: center; justify-content: space-between; gap: 4px;
   }
-  .day-card:active { transform: scale(0.98); }
-  .day-card.today { border-color: var(--pink-main); background: #fffafb; }
-  .day-num { font-family: var(--font-sans); font-weight: 700; font-size: 16px; color: var(--text-main); min-width: 24px; text-align: center; }
-  .day-heart { position: absolute; top: 8px; right: 10px; font-size: 12px; color: var(--border-color); }
-  .day-card.done .day-heart { color: var(--pink-main); }
 
-    .drops-grid { 
+  .drops-grid { 
     display: grid; 
     grid-template-columns: repeat(4, 22px); 
     gap: 6px; 
     justify-content: center; 
     align-items: center;
   }
+  
   .drop {
     width: 22px; height: 22px; border-radius: 50% 50% 50% 0;
     transform: rotate(-45deg); border: 2.5px solid var(--blue-main);
