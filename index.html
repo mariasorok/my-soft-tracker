@@ -507,7 +507,7 @@
 
   function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
 
-  function switchTab(tabName) {
+      function switchTab(tabName) {
     playSound('click');
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
     document.querySelectorAll('.screen').forEach(scr => scr.classList.remove('active'));
@@ -515,6 +515,7 @@
     ['water', 'pills', 'sport', 'mood'].forEach((name, i) => {
       if (name === tabName) btns[i].classList.add('active');
     });
+    
     document.getElementById('screen-' + tabName).classList.add('active');
     
     if (tabName === 'mood') renderMood();
@@ -522,8 +523,31 @@
     if (tabName === 'water') renderWater();
     if (tabName === 'pills') renderPills();
     
+    // ПРИНУДИТЕЛЬНЫЙ СКРОЛЛ ДЛЯ КАЖДОЙ ВКЛАДКИ
     if (tabName === 'water' || tabName === 'sport' || tabName === 'mood') {
-      scrollToToday();
+      setTimeout(() => {
+        let target = null;
+        
+        if (tabName === 'water') target = document.getElementById('waterGrid').querySelector('.today');
+        if (tabName === 'mood') target = document.getElementById('moodGrid').querySelector('.today');
+        
+        // В спорте ищем строку таблицы (tr), в которой есть сегодняшний день
+        if (tabName === 'sport') {
+          const rows = document.querySelectorAll('#sportTableBody tr');
+          for (let row of rows) {
+            if (row.innerHTML.includes('class="today"') || row.style.backgroundColor) {
+              target = row;
+              break;
+            }
+          }
+        }
+
+        if (target) {
+          const yOffset = -120; 
+          const y = target.getBoundingClientRect().top + window.pageYOffset + yOffset;
+          window.scrollTo({ top: y, behavior: 'smooth' });
+        }
+      }, 300); // Даем полсекунды, чтобы браузер всё пересчитал
     }
   }
 
@@ -596,7 +620,7 @@
   }
 
   const SPORT_KEYS = ['morning', 'workout', 'back', 'evening'];
-  function renderSport() {
+    function renderSport() {
     const tbody = document.getElementById('sportTableBody');
     const todayStr = todayKey();
     const currentMonth = viewDate.getMonth();
@@ -611,11 +635,16 @@
       const isToday = dateStr === todayStr;
       const doneCount = Object.values(sportData).filter(v => v === 1).length;
       if (doneCount === 4) daysWithAllSport++;
-      html += `<tr class="${isToday ? 'today-row' : ''}" style="${isToday ? 'background-color: var(--green-light);' : ''}"><td>${day}</td>`;
+      
+      // Вот эта строка была сломана (я добавил класс today к ячейке):
+      html += `<tr class="${isToday ? 'today-row' : ''}" style="${isToday ? 'background-color: var(--green-light);' : ''}"><td class="${isToday ? 'today' : ''}">${day}</td>`;
+      
+      // А ВОТ ЭТОЙ СТРОЧКИ НЕ ХВАТАЛО! Она запускает цикл по видам спорта:
       SPORT_KEYS.forEach(key => {
         const isFull = sportData[key] === 1;
         html += `<td><div class="sport-check ${isFull ? 'full' : ''}" onclick="toggleSport('${dateStr}', '${key}')">${isFull ? '✓' : ''}</div></td>`;
       });
+      
       html += `</tr>`;
     }
     tbody.innerHTML = html;
@@ -853,17 +882,12 @@
   }
 
   function scrollToToday() {
-    // Ждем 700мс, чтобы вкладка успела полностью отрисоваться (особенно в Safari)
     setTimeout(() => {
-      // Ищем карточку сегодняшнего дня (в воде/настроении) или строку (в спорте)
-      const todayElement = document.querySelector('.day-card.today, .today-row');
-      if (todayElement) {
-        // Считаем позицию элемента и скроллим окно напрямую (это надежнее, чем scrollIntoView)
-        const yOffset = -100; // Оставляем немного места сверху, чтобы было видно шапку
-        const y = todayElement.getBoundingClientRect().top + window.pageYOffset + yOffset;
-        window.scrollTo({ top: y, behavior: 'smooth' });
+      const todayCard = document.querySelector('.day-card.today, .today-row');
+      if (todayCard) {
+        todayCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
-    }, 700);
+    }, 500); // Небольшая задержка, чтобы Safari успел отрисовать страницу
   }
 
   document.getElementById('pillInput').addEventListener('keydown', e => { if (e.key === 'Enter') addPill(); });
